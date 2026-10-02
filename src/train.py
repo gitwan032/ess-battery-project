@@ -24,7 +24,7 @@ from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import ElasticNet, Ridge
-from sklearn.model_selection import GridSearchCV, GroupKFold, cross_val_predict
+from sklearn.model_selection import GridSearchCV, cross_val_predict
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -53,6 +53,14 @@ MODELS = {
 }
 
 
+def policy_folds(groups, n_splits=5):
+    """충전 정책 단위 fold 고정 (정책 이름순으로 0~4 fold 배정, 버전 무관 재현)"""
+    pol = sorted(groups.unique())
+    fold_of = {p: i % n_splits for i, p in enumerate(pol)}
+    f = groups.map(fold_of).values
+    return [(np.where(f != k)[0], np.where(f == k)[0]) for k in range(n_splits)]
+
+
 def metrics(y_true, y_pred):
     e = y_pred - y_true
     return {'MAPE': np.mean(np.abs(e) / y_true) * 100,
@@ -68,7 +76,7 @@ def run(features_csv, out_dir='results'):
     tests = {'B2': df[df['batch'] == 'b2'], 'B3': df[df['batch'] == 'b3']}
     lo, hi = tr['cycle_life'].min(), tr['cycle_life'].max()
     groups = tr['policy']
-    cv = GroupKFold(n_splits=5)
+    cv = policy_folds(groups, n_splits=5)
     print(f'train B1 n={len(tr)}, policies={groups.nunique()}, life range {lo:.0f}~{hi:.0f}')
 
     rows, preds, extra = [], [], []
@@ -79,11 +87,11 @@ def run(features_csv, out_dir='results'):
                              ('sc', StandardScaler()), ('m', model)])
             gs = GridSearchCV(pipe, grid or {'m__strategy': ['mean']}, cv=cv,
                               scoring='neg_mean_squared_error')
-            gs.fit(X, y, groups=groups)
+            gs.fit(X, y)
             best = gs.best_estimator_
 
             # B1 CV 성능 (선택된 하이퍼파라미터로 그룹 CV 예측)
-            oof = 10 ** cross_val_predict(best, X, y, cv=cv, groups=groups)
+            oof = 10 ** cross_val_predict(best, X, y, cv=cv)
             rows.append({'feature_set': fs_name, 'model': m_name, 'split': 'CV_B1',
                          **metrics(tr['cycle_life'].values, oof), 'params': str(gs.best_params_)})
 
