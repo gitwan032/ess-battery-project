@@ -1,0 +1,8 @@
+data/raw/
+data/cache/
+*.mat
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+notebooks/cache/
+.DS_Store

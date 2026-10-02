@@ -1,0 +1,23 @@
+train B1 n=36, policies=20, life range 534~1074
+split                           B2    B3  CV_B1
+feature_set     model                          
+A_dq_var        Dummy         59.1  22.7   16.9
+                ElasticNet    28.6  11.7    8.5
+                GBM           30.8  14.2    8.9
+                RandomForest  30.2  15.5    8.8
+                Ridge         28.6  11.7    8.5
+B_dq_var+fade   Dummy         59.1  22.7   16.9
+                ElasticNet    31.5  11.6    8.9
+                GBM           25.9  14.5    8.8
+                RandomForest  30.4  15.4    8.6
+                Ridge         40.4  13.0   10.1
+C_dq_min        Dummy         59.1  22.7   16.9
+                ElasticNet    30.6  11.8    9.0
+                GBM           31.1  17.4   10.5
+                RandomForest  30.6  15.7    9.7
+                Ridge         30.6  11.8    9.0
+D_with_excluded Dummy         59.1  22.7   16.9
+                ElasticNet    43.6  12.8    6.8
+                GBM           34.7  16.7    9.1
+                RandomForest  30.8  16.4    8.4
+                Ridge         50.5  20.3    8.5
