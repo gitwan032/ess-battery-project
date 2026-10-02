@@ -172,5 +172,5 @@ python src/train.py                             # results/ 생성
 ## 참고문헌
 - Severson et al. (2019). Data-driven prediction of battery cycle life before capacity degradation. *Nature Energy*, 4, 383–391.
 
-## 팀 구성
-- 홍동완 (울산_1반) : EDA, 피처 엔지니어링, 모델 개발, 성능 평가
+## 작성자
+- 홍동완 (울산_1반)
